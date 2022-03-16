@@ -4,13 +4,13 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Blog, Tag
-from .forms import BlogForm
+from .forms import BlogForm, CommentForm
 from .utils import searchBlogs, paginateBlogs
 
 
 def blogs(request):
     blogs, search_query = searchBlogs(request)
-    custom_range, blogs = paginateBlogs(request, blogs, 6)
+    custom_range, blogs = paginateBlogs(request, blogs, 3)
 
     context = {'blogs': blogs,
                'search_query': search_query, 'custom_range': custom_range}
@@ -19,12 +19,19 @@ def blogs(request):
 
 def blog(request, pk):
     blogObj = Blog.objects.get(id=pk)
+    form = CommentForm()
 
     if request.method == 'POST':
+        form = CommentForm(request.POST)
+        comment = form.save(commit=False)
+        comment.blog = blogObj
+        comment.owner = request.user.profile
+        comment.save()
 
+        messages.success(request, 'Your comment was successfully submitted!')
         return redirect('blog', pk=blogObj.id)
 
-    return render(request, 'blog/single-blog.html', {'blog': blogObj})
+    return render(request, 'blog/single-blog.html', {'blog': blogObj, 'form': form})
 
 
 @login_required(login_url="login")
