@@ -4,7 +4,8 @@
 <header class="header">
     <div class="container container--narrow">
         <a href="#" class="header__logo">
-            <img src="{% static 'images/logo.svg' %} " alt="DevSearch Logo" />
+            <h3>Blog App</h3>
+<!--            <img src="{% static 'images/logo.svg' %} " alt="DevSearch Logo" />-->
         </a>
 
         <nav class="header__nav">
@@ -14,9 +15,16 @@
                 <div class="toggle-menu__lines"></div>
             </label>
             <ul class="header__menu">
+                <li class="header__menuItem"><a href="{% url 'profiles' %}">Developers</a></li>
 
 
 
+                {% if request.user.is_authenticated %}
+
+                <li class="header__menuItem"><a href="{% url 'logout' %}" class="btn btn--sub">Logout</a></li>
+                {% else %}
+                <li class="header__menuItem"><a href="{% url 'login' %}" class="btn btn--sub">Login/Sign Up</a></li>
+                {% endif %}
             </ul>
         </nav>
     </div>
